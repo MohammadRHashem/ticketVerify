@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CyberSec Event Ticket Scanner</title>
+    <style>
+      /* Basic reset */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body,
+      html {
+        width: 100%;
+        height: 100%;
+        font-family: Arial, sans-serif;
+        background: #f4f6f8;
+        color: #333;
+      }
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: start;
+        height: 100%;
+        padding: 1rem;
+      }
+      h1 {
+        margin-bottom: 0.5rem;
+        font-size: 1.75rem;
+        color: #1a202c;
+      }
+      #video {
+        width: 100%;
+        max-width: 600px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        background: #000;
+      }
+      .scanner-wrapper {
+        position: relative;
+        width: 100%;
+        max-width: 600px;
+      }
+      #message {
+        margin-top: 1rem;
+        font-size: 1.1rem;
+        color: #555;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Ticket QR Scanner</h1>
+      <p id="message">Point your camera at the ticket QR code.</p>
+      <div class="scanner-wrapper">
+        <video id="video" autoplay playsinline></video>
+        <canvas id="canvas" style="display: none"></canvas>
+      </div>
+    </div>
+
+    <!-- Include jsQR library -->
+    <script src="jsQr.js"></script>
+    <script>
+      (async () => {
+        const video = document.getElementById("video");
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+        const messageEl = document.getElementById("message");
+
+        // List of valid emails
+        const validEmails = [
+          "youssef1000rahal@gmail.com",
+          "mahdizaytoun304@gmail.com",
+          "abedsaeed17@gmail.com",
+          "melhemghina061@gmail.com",
+          "mohamadjahami3000@gmail.com",
+          "mahdihreish1@gmail.com",
+          "akhdarhussein7@gmail.com",
+          "alaagazala00@gmail.com",
+          "nourkhater33@gmail.com",
+          "alirihanrihan14@gmail.com",
+          "zeinabmansour203@gmail.com",
+          "alyhaydar.474@gmail.com",
+          "hussein.nasser.313.h@gmail.com",
+          "alhajjhusam01@gmail.com",
+          "mhmdbouk02@gmail.com",
+          "bossharb123@gmail.com",
+          "fatima.ismail04.lb@gmail.com",
+          "mhmditani008@gmail.com",
+          "srourali.sa@gmail.com",
+          "jananoureddine666@gmail.com",
+          "hawraakanso016@gmail.com",
+          "malakissa639@gmail.com",
+          "sleimanhassan69@gmail.com",
+          "hibaeldor3@gmail.com",
+          "zahraaroumieh33@gmail.com",
+          "malakyounes2004@gmail.com",
+          "leyakassir2@gmail.com",
+          "mazenjazairi674@gmail.com",
+          "hussein.alroumi.1998@gmail.com",
+          "ibrahimalarab128@gmail.com",
+          "yskayki49@gmail.com",
+          "n04907221@gmail.com",
+          "laylachaaban34@gmail.com",
+          "lahamzahraa265@gmail.com",
+          "raghadalkassem98@gmail.com",
+          "saidmobile77660@gmail.com",
+          "marymalmansour979@gmail.com",
+          "hadimoustafa3@gmail.com",
+          "mhmdalsaad40@gmail.com",
+          "alikassir104@gmail.com",
+          "mohamadalaadeen004@gmail.com",
+          "mhmdkasem882@gmail.com",
+          "nouradabbit16@gmail.com",
+          "hashem.r.mohammad.mh7@gmail.com",
+          "kzeinddein@gmail.com",
+          "abdallameslmani204@gmail.com",
+          "enghasanabbas5@gmail.com",
+          "aliataya864@gmail.com",
+          "mhmdnsrlla151@gmail.com",
+          "hasansouheil7@gmail.com",
+          "alicebakeer2021@gmail.com",
+          "ndr673429@gmail.com",
+          "sliemanbaraa@gmail.com",
+          "alayanabbass03@gmail.com",
+          "sarahojeij123@gmail.com",
+          "zeinabalzaghir@gmail.com",
+          "mariam.badawi2017@gmail.com",
+          "mostafabazoun@gmail.com",
+          "souadeiid4@gmail.com",
+          "alidouri1233@gmail.com",
+          "salamims921@gmail.com",
+          "fatimahammoud870@gmail.com",
+          "gheinabannout15@gmail.com",
+          "fatimamannaa897@gmail.com",
+          "riwa.jihad.awad@gmail.com",
+          "fatimajeha.07@gmail.com",
+          "boukharyalaa059@gmail.com",
+          "mhmdhoumani04@gmail.com",
+          "nouralaaraj05@gmail.com",
+          "tqytala63@gmail.com",
+          "noorhankir14@gmail.com",
+          "wyoumoon@gmail.com",
+          "ffa29483@gmail.com",
+          "hawraasayeghiul@gmail.com",
+          "husseinissa729@gmail.com",
+          "lianajomaa@gmail.com",
+          "jad30890@gmail.com",
+          "abas.assyi@gmail.com",
+          "muhamadgoch90@gmail.com",
+          "ralphsaghbini23@gmail.com",
+          "sallykawtharani14@gmail.com",
+          "zahraa.mkhaderid@gmail.com",
+          "hasanyounes5412@gmail.com",
+          "rttfaily@gmail.com",
+          "fatima959rm@gmail.com",
+          "saso.aldahi@gmail.com",
+          "curiosity404cabinet@gmail.com",
+          "baydounyara54@gmail.com",
+          "ramazein309@gmail.com",
+          "alihoballah200310@gmail.com",
+          "marwa.1makke50@gmail.com",
+          "mayadabtieh1@gmail.com",
+          "hadikisserwan430@gmail.com",
+          "marwaassi2002@gmail.com",
+          "mohammadyouness2004@gmail.com",
+          "alaahamzeh98@gmail.com",
+          "fatimashakaron4@gmail.com",
+          "omralahmad489@gmail.com",
+          "laraabdelnabi4@gmail.com",
+          "mkddad57@gmail.com",
+          "batoulmousanewacc@gmail.com",
+          "ramielyoussefcc@gmail.com",
+          "ridaassaf686@gmail.com",
+          "tasnimelbardane@gmail.com",
+          "alaamalak1010@gmail.com",
+          "kindayehya5@gmail.com",
+          "malakmnsr73@gmail.com",
+          "tarhinimohammadbaker@gmail.com",
+          "hadi60787@gmail.com",
+          "aliismailcr7@gmail.com",
+          "mariamhaidar363@gmail.com",
+          "mrnewbie1000@gmail.com",
+          "halaala009@gmail.com",
+          "chaabanrj@gmail.com",
+          "aliiscomingtoeurope@gmail.com",
+          "adamhafi89@gmail.com",
+          "zein.hmadeh@gmail.com",
+          "atwi.100virus@gmail.com",
+          "sbatoul542@gmail.com",
+          "kawtharawada986@gmail.com",
+          "ali2ajjour@gmail.com",
+          "af00403p@gmail.com",
+          "huss.jbr@gmail.com",
+          "ray0123an@gmail.com",
+          "yehyaassi816@gmail.com",
+          "lea.youssef33@gmail.com",
+          "hamzehali817@gmail.com",
+          "husseinkanaan152@gmail.com",
+          "abbasmshyk50@gmail.com",
+          "nana.sawli.2018@gmail.com",
+          "fatemawbas93@gmail.com",
+          "tamim.afif.04@gmail.com",
+          "bathichhuda@gmail.com",
+          "shaabanleen1@gmail.com",
+          "mbkzahraa@gmail.com",
+          "reemshamseddeen@gmail.com",
+          "saranajame60@gmail.com",
+          "evamagic2@gmail.com",
+          "luc.hardan@gmail.com",
+          "mazen.shamdeen99@gmail.com",
+          "nassarali517@gmail.com",
+          "abboudet@gmail.com",
+          "kassemjomaa2828@gmail.com",
+          "mahmoudabboud2020@gmail.com",
+          "aliaboelezz95@gmail.com",
+          "hibabadawi2005@gmail.com",
+          "fatenfaten3033@gmail.com",
+          "mhj8412@gmail.com",
+          "raaadnan3@gmail.com",
+          "alliiothman573@gmail.com",
+          "mhmdayoub254@gmail.com",
+          "oussaylisima@gmail.com",
+          "zainabawada09@gmail.com",
+          "haythammog.2005@gmail.com",
+          "msheikjawad123@gmail.com",
+          "ahmadkbysi88@gmail.com",
+          "iyadmortada3@gmail.com",
+          "nonnahaidar@gmail.com",
+          "fatimaalikassem26102006@gmail.com",
+          "haidarfatima101@gmail.com",
+          "salmahmadeh80@gmail.com",
+          "nour.hmadi.a@gmail.com",
+          "mahdi.ne01@gmail.com",
+          "hassanhallal25@gmail.com",
+          "ftouni241@gmail.com",
+          "s.c.youg@gmail.com",
+          "hananmhana2024@gmail.com",
+          "z2385791@gmail.com",
+          "maryamzienaldeen@gmail.com",
+          "shehadiibrahim5@gmail.com",
+          "oussama.sd04@gmail.com",
+          "mostafakaddouh35@gmail.com",
+          "fadelfakih092@gmail.com",
+          "hssenjaffal55@gmail.com",
+          "aminelhajj9@gmail.com",
+          "harbh3401@gmail.com",
+          "mansourrayan783@gmail.com",
+          "hsnbyrmm1@gmail.com",
+          "amalbarakat011@gmail.com",
+          "ayaezzeddine83@gmail.com",
+          "jam64saab@gmail.com",
+          "hasanmortada838@gmail.com",
+          "phantomx5313@gmail.com",
+          "ysnhassan0@gmail.com",
+          "jana.g.abdallah@gmail.com",
+          "fakhriden.1002@gmail.com",
+          "husseinomeis2014@gmail.com",
+          "dialamakke@gmail.com",
+          "sajajaber3412@gmail.com",
+          "batoolkassem40@gmail.com",
+          "nisreenhamze10@gmail.com",
+          "kassemfatme070@gmail.com",
+          "zaytersarah@gmail.com",
+          "aliamiri405060@gmail.com",
+          "mariam.2005.awwad@gmail.com",
+          "alinajem174@gmail.com",
+          "mostafa.nassar829@gmail.com",
+          "ali313younis@gmail.com",
+          "fouad.malak2000@gmail.com",
+          "mestrahnour04@gmail.com",
+          "razanyounes2019@gmail.com",
+          "ahmadtarhini13@gmail.com",
+          "hassounnour075@gmail.com",
+          "muhannad.alamm@gmail.com",
+          "aliwehbe703@gmail.com",
+          "hadi.a.tarhini19@gmail.com",
+          "useheadphones486@gmail.com",
+          "hadi.salman997@gmail.com",
+          "ayaabedalnabi820@gmail.com",
+          "mohameddiab70253329@gmail.com",
+          "amhazibrahim5@gmail.com",
+          "tarekalabed173@gmail.com",
+          "c1ybers2ecurity23@gmail.com",
+          "mr.hussein.itani@gmail.com",
+          "mahmoudalshikh145@gmail.com",
+          "danamsheik90@gmail.com",
+          "rihamaljazairi@gmail.com",
+          "ayachaaban31@gmail.com",
+          "haythammachmouchy@gmail.com",
+          "sireenabouibraheem928@gmail.com",
+          "mezheryasmine33@gmail.com",
+          "salehabbas269@gmail.com",
+          "anismaiil@gmail.com",
+          "angysaleh2005@gmail.com",
+          "ali313zaytoun@gmail.com",
+          "ha6095000@gmail.com",
+          "safaa.darwish2004@gmail.com",
+          "zaynbhmede97@gmail.com",
+          "fjgjgvbfjh@gmail.com",
+          "moudi.fawez@gmail.com",
+          "alikassir71@gmail.com",
+          "akaafarani31@gmail.com",
+          "chaabanali331@gmail.com",
+          "nourhatarhini@gmail.com",
+          "alirahme656@gmail.com",
+          "jaafarhajali33@gmail.com",
+        ];
+
+        // Automatically start scanning on load
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "environment" },
+          });
+          video.srcObject = stream;
+          await video.play();
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          scanLoop();
+        } catch (err) {
+          messageEl.textContent = "Error accessing camera: " + err.message;
+        }
+
+        function scanLoop() {
+          if (video.readyState === video.HAVE_ENOUGH_DATA) {
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imageData = ctx.getImageData(
+              0,
+              0,
+              canvas.width,
+              canvas.height
+            );
+            const code = jsQR(
+              imageData.data,
+              imageData.width,
+              imageData.height,
+              { inversionAttempts: "dontInvert" }
+            );
+            if (code) {
+              const email = code.data.trim();
+              if (validEmails.includes(email)) {
+                alert(`✅ Ticket valid: ${email}`);
+              } else {
+                alert(`❌ Ticket not found: ${email}`);
+              }
+              // After successful scan, continue scanning for next codes
+            }
+          }
+          requestAnimationFrame(scanLoop);
+        }
+      })();
+    </script>
+  </body>
+</html>
